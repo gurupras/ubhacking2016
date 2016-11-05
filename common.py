@@ -1,4 +1,4 @@
-import os,sys
+import os,sys,argparse
 import logging
 import multiprocessing
 
@@ -23,6 +23,7 @@ def setup_parser(parser=None):
 		parser = argparse.ArgumentParser(description='Process audio file')
 	parser.add_argument('source', help='The file or directory to process')
 	parser.add_argument('--dump', action='store_true', help='Dump intermediate format')
+	return parser
 
 def common_process(dump_callback, print_callback, regex):
 	parser = setup_parser()
@@ -39,10 +40,13 @@ def process_path(path, callback, pool=None, regex='*'):
 	if pool:
 		pool = multiprocessing.Pool()
 
-	for file in entry.get_files():
-		if pool:
-			pool.apply_async(func=callback, args=(file.path(),))
-		callback(file.path())
+	if entry.isdir():
+		for file in entry.get_files():
+			if pool:
+				pool.apply_async(func=callback, args=(file.path(),))
+			process_path(file.path(), callback, pool, regex)
+	else:
+		callback(entry.path())
 	if pool:
 		pool.close()
 		pool.join()

@@ -65,6 +65,8 @@ def dump_bpm(path):
 		f.write(json.dumps(list(allbpm)))
 
 def print_bpm(path):
+	if not path.endswith('.bpm'):
+		path += '.bpm'
 	with pycommons.open_file(path, 'rb', True) as f:
 		bpm =json.loads(f.read())
 		print '{} -> {}'.format(path, np.median(bpm))

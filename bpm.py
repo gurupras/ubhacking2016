@@ -2,6 +2,9 @@ from aubio import source, tempo
 import numpy as np
 import common
 import sys
+import argparse
+import json
+import pycommons
 
 def get_file_all_bpm(path, params = None):
 	""" Calculate the beats per minute (bpm) of a given file.
@@ -49,20 +52,30 @@ def get_file_all_bpm(path, params = None):
 		if len(beats) < 4:
 			print("few beats found in {:s}".format(path))
 		bpms = 60./np.diff(beats)
-		#b = (np.median(bpms), np.min(bpms), np.max(bpms))
-		#import matplotlib.pyplot as plt
-		#plt.plot(np.arange(bpms), bpms)
-		#plt.show()
-		b = np.median(bpms)
+		return bpms
 	else:
-		#b = (0, 0, 0)
 		b = 0
 		print("not enough beats found in {:s}".format(path))
-	return b
+		return []
+
+def dump_bpm(path):
+	outpath = path + '.bpm'
+	allbpm = get_file_all_bpm(path)
+	with pycommons.open_file(outpath, 'wb', True) as f:
+		f.write(json.dumps(list(allbpm)))
 
 def print_bpm(path):
-	bpm = get_file_bpm(path)
-	print '{} -> {}'.format(path, bpm)
+	with pycommons.open_file(path, 'rb', True) as f:
+		bpm =json.loads(f.read())
+		print '{} -> {}'.format(path, np.median(bpm))
 
 if __name__ == '__main__':
-	common.process_path(sys.argv[1], print_bpm)
+	parser = argparse.ArgumentParser(description='Process audio file bpm')
+	parser.add_argument('source', help='The file or directory to process')
+	parser.add_argument('--dump', action='store_true', help='Dump intermediate format')
+	args = parser.parse_args()
+
+	if args.dump:
+		common.process_path(args.source, dump_bpm, regex='*.mp3')
+	else:
+		common.process_path(args.source, print_bpm, regex='*.bpm')

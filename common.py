@@ -18,9 +18,9 @@ logger = logging.getLogger(__file__)
 
 from pycommons.file_entry import FileEntry
 
-def process_path(path, callback, pool=None):
+def process_path(path, callback, pool=None, regex='*'):
 	entry = FileEntry(path, None)
-	entry.build(regex='*')
+	entry.build(regex=regex)
 	if pool:
 		pool = multiprocessing.Pool()
 

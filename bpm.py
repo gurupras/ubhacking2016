@@ -70,12 +70,4 @@ def print_bpm(path):
 		print '{} -> {}'.format(path, np.median(bpm))
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Process audio file bpm')
-	parser.add_argument('source', help='The file or directory to process')
-	parser.add_argument('--dump', action='store_true', help='Dump intermediate format')
-	args = parser.parse_args()
-
-	if args.dump:
-		common.process_path(args.source, dump_bpm, regex='*.mp3')
-	else:
-		common.process_path(args.source, print_bpm, regex='*.bpm')
+	common.common_process(dump_bpm, print_bpm, '*.bpm')

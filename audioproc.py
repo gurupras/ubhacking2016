@@ -1,5 +1,7 @@
 from aubio import source, tempo
 import numpy as np
+import common
+import sys
 
 def get_file_bpm(path, params = None):
 	""" Calculate the beats per minute (bpm) of a given file.
@@ -54,8 +56,13 @@ def get_file_bpm(path, params = None):
 		b = np.median(bpms)
 	else:
 		#b = (0, 0, 0)
-        b = 0
+		b = 0
 		print("not enough beats found in {:s}".format(path))
 	return b
 
-get_file_bpm('test.mp3')
+def print_bpm(path):
+	bpm = get_file_bpm(path)
+	print '{} -> {}'.format(path, bpm)
+
+if __name__ == '__main__':
+	common.process_path(sys.argv[1], print_bpm)

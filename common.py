@@ -24,15 +24,10 @@ def process_path(path, callback, pool=None, regex='*'):
 	if pool:
 		pool = multiprocessing.Pool()
 
-
-	if entry.isdir():
-		for child in entry:
-			process_path(child.path(), callback)
-	else:
-		# This is a file
+	for file in entry.get_files():
 		if pool:
-			pool.apply_async(func=callback, args=(entry.path(),))
-		callback(entry.path())
+			pool.apply_async(func=callback, args=(file.path(),))
+		callback(file.path())
 	if pool:
 		pool.close()
 		pool.join()

@@ -59,17 +59,17 @@ def get_file_all_bpm(path, params = None):
 		return []
 
 def dump_bpm(path):
-	outpath = path + '.bpm'
+	outpath = path + '.bpm.gz'
 	allbpm = get_file_all_bpm(path)
 	with pycommons.open_file(outpath, 'wb', True) as f:
 		f.write(json.dumps(list(allbpm)))
 
 def print_bpm(path):
 	if not path.endswith('.bpm'):
-		path += '.bpm'
+		path += '.bpm.gz'
 	with pycommons.open_file(path, 'rb', True) as f:
 		bpm =json.loads(f.read())
 		print '{} -> {}'.format(path, np.median(bpm))
 
 if __name__ == '__main__':
-	common.common_process(dump_bpm, print_bpm, '*.bpm')
+	common.common_process(dump_bpm, print_bpm, '*.bpm.gz')

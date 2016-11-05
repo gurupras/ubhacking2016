@@ -7,3 +7,8 @@
 *.pyc
 
 pycommons/
+
+*.bpm
+*.bpm.gz
+*.pitch
+*.pitch.gz

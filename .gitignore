@@ -1,0 +1,7 @@
+/ffmeg*
+/libav
+/aubio
+/env
+
+.*.sw*
+*.pyc

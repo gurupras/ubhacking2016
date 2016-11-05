@@ -3,7 +3,7 @@ import numpy as np
 import common
 import sys
 
-def get_file_bpm(path, params = None):
+def get_file_all_bpm(path, params = None):
 	""" Calculate the beats per minute (bpm) of a given file.
 		path: path to the file
 		param: dictionary of parameters

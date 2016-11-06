@@ -10,7 +10,7 @@ body {
 }
 
 .header-row {
-  height: 10%;
+  height: 20%;
 }
 
 .media-row {
@@ -57,4 +57,10 @@ body {
     padding-left: 10%;
     font-size: 0.8em;
 
+}
+
+
+#brand {
+    position: relative;
+    height: 100%;
 }

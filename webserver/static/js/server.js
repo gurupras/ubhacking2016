@@ -29,6 +29,7 @@ window.onload = function() {
 		$('#search-input').autocomplete(data);
 	});
 
+
 	socket.on('mashup', function(msg) {
 		var json = JSON.parse(msg);
 		player.source({
@@ -42,6 +43,10 @@ window.onload = function() {
 		$('#download').on('click', function() {
 			window.location = json.src;
 		});
+
+		// Hide spinner
+		$('#spinner').hide();
+		
 		for (var b of json.blobs) {
 			delete b.path;
 		}
@@ -54,12 +59,16 @@ window.onload = function() {
 	};
 
 	var runOnce;
-	$('#search').on('keyup', function() {
+
+//TODO: Enter
+	$('#search').on('keyup', function(e) {
+
 		if(runOnce) {
 			$('#search').off('keyup');
 		} else {
 			$('#search').find('.dropdown-content').on('click', function(e) {
 				submit($(e.target).text());
+				$('#spinner').show();
 			});
 			runOnce = true;
 		}

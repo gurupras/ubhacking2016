@@ -40,12 +40,12 @@ function listAvailableTracks(callback) {
 	}
 	var result = [];
 	collection = mongo.collection('songs')
-	collection.find({}, {artist:true, track:true}).toArray(function(err, docs) {
+	collection.find({}, {_id:true, artist:true, track:true}).toArray(function(err, docs) {
 		console.log(docs.length)
 		for (var d of docs) {
 			var name = d.artist + ' - ' + d.track.replace('.features', '')
 			name = name.replace(/_/g, '/');
-			result.push(name);
+			result.push({id: _id, track: name)};
 		}
 		console.log('result files:' + result.length);
 		availableTracks = result;

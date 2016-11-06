@@ -27,6 +27,7 @@ app.get('/', function (req, res) {
 app.use('/static', express.static('./static'));
 app.use('/media/ext/Guru/Music', express.static('/media/ext/Guru/Music'));
 
+//function mashup(
 
 function endsWith(str, suffix) {
 	return str.indexOf(suffix, str.length - suffix.length) !== -1;
@@ -57,25 +58,94 @@ function listAvailableTracks(callback) {
 	});
 }
 
+function round5(x) {
+	return Math.ceil(x/5)*5
+}
+
+var bpms;
+
+function createBpmLists(callback) {
+	if (bpms) {
+		callback()
+		return
+	}
+	bpms = {}
+	collection = mongo.collection('songs')
+	collection.find({}, {_id:true, ub_source_file:true, sections:true}).toArray(function(err, docs) {
+		for (var d of docs) {
+			for (section of d.sections) {
+				tempo = round5(section.tempo);
+				if (!bpms[tempo]) {
+					bpms[tempo] = []
+				}
+				bpms[tempo].push({_id:d._id, source: d.ub_source_file, data: section})
+			}
+		}
+		callback()
+	});
+}
+
+const startDuration = 15.0;
+const usePrevBpm = false;
+const sourceFreq = 2;
+
+function mashup(id, callback) {
+	result = []
+	collection = mongo.collection('songs')
+	collection.findOne({_id: id}, function(err, item) {
+		var pos = 0.0, index = 0, prevBpm = 0;
+		var wasSource = false, blobs = [];
+		var l = item.sections.length;
+		sourceCntr = 0;
+
+		for (s of item.sections) {
+			var choice;
+			// Pick next section
+			if (pos < startDuration || sourceCntr == sourceFreq || index == l-1) {
+				pos += s.duration;
+				choice = {_id: item._id, source: item.ub_source_file, data: s}
+				sourceCntr = 0;
+			} else {
+				if (usePrevBpm) {
+					tempo = prevBpm;
+				} else {
+					tempo = s.tempo;
+				}
+				tempo = round5(s.tempo);
+				r = Math.floor(Math.random() * bpms[tempo].length);
+				choice = bpms[tempo][r];
+				sourceCntr += 1;
+			}
+			prevBpm = choice.data.tempo;
+			blob = {source: choice.source, start: choice.data.start, duration: choice.data.duration}
+			blobs.push(blob)
+			index += 1;
+		}
+		callback(blobs)
+	});
+}
+
 io.on('connection', function(socket) {
 	// Get autocomplete json
 	listAvailableTracks(function(json) {
 		socket.emit('autocomplete', JSON.stringify(json));
+		createBpmLists(function(){});
 	});
 	socket.on('mashup', function(msg) {
 		track = msg.file;
-		file = track + '.features.gz';
-		file = file.replace(/\//g, '_');
-		// Open this file and find the source
-		file = '/phonelab/hackathon-data/' + file;
-		//file = file.replace(/ /g, '\ ');
-		var cmd = 'zcat "' + file + '"';
-		console.log('CMD:' + cmd);
-		var jsonStr = child_process.execSync(cmd, {shell: '/bin/bash'});
-		var json = JSON.parse(jsonStr);
-		var data = {};
-		data.src = json.ub_source_file;
-		socket.emit('mashup', JSON.stringify(data));
+		var id = trackMap[track]
+		if (id) {
+			console.log('found id=' +id)
+			mashup(id, function(blobs) {
+				//data.src = json.ub_source_file;
+				//socket.emit('mashup', JSON.stringify(data));
+				for (b of blobs) {
+					console.log(b)
+				}
+				// TODO: What?
+				console.log('mashup done')
+			});
+		}
 	});
 });
 

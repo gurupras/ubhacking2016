@@ -1,0 +1,5 @@
+# Don't ignore .gitignore
+!.gitignore
+
+/static/media
+/node_modules

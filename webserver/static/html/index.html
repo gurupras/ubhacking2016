@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <script src="/static/js/redist/jquery-2.2.0.min.js" defer></script>
+
+    <script src="/static/js/server.js" defer></script>
+    <link href="/static/css/server.css" rel="stylesheet">
+
+    <script src="https://cdn.plyr.io/2.0.10/plyr.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/2.0.10/plyr.css">
+
+    <script src="/static/js/redist/socket.io.min.js" defer></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="body-div" class="container-fluid">
+      <nav>
+        <div class="nav-wrapper green center" style="width: 100%;">
+          <div class="brand-logo">Mash 'Em All</div>
+        </div>
+      </nav>
+
+      <div class="row">
+        <div class="col m6 l6 s12">
+          <div class="media-row row">
+            <div id="video-div" class="video-div col s12">
+              <div id="plyr" class="audio player">
+                <audio controls>
+                  <source src="/static/media/test.mp3">
+                </audio>
+              </div>
+            </div>
+          </div>
+          <div id="search-row" class="row">
+            <div id="search" class="col s12 input-field">
+              <input type="text" id="search-input" class="autocomplete">
+              <label for="autocomplete-input">Artist - Track</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

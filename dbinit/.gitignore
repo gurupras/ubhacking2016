@@ -1,0 +1,4 @@
+# Don't ignore .gitignore
+!.gitignore
+
+/node_modules

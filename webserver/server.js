@@ -9,6 +9,9 @@ var child_process = require('child_process');
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
+var MongoClient = require('mongodb').MongoClient
+var assert = require('assert')
+
 var HTTP_PORT = 8080;
 
 app.use(morgan('combined'));
@@ -30,26 +33,32 @@ function endsWith(str, suffix) {
 }
 
 var availableTracks;
-function listAvailableTracks() {
+function listAvailableTracks(callback) {
+	if (availableTracks) {
+		callback(availableTracks);
+		return;
+	}
 	var result = [];
-	var files = fs.readdirSync('/phonelab/hackathon-data');
-	for(var f in files) {
-		if(endsWith(files[f], '.analysis.gz')) {
-			var name = files[f].substring(0, files[f].indexOf('.analysis.gz'));
+	collection = mongo.collection('songs')
+	collection.find({}, {artist:true, track:true}).toArray(function(err, docs) {
+		console.log(docs.length)
+		for (var d of docs) {
+			var name = d.artist + ' - ' + d.track.replace('.features', '')
 			name = name.replace(/_/g, '/');
 			result.push(name);
 		}
-	}
-	console.log('result files:' + result.length);
-	availableTracks = result;
-	return result;
+		console.log('result files:' + result.length);
+		availableTracks = result;
+
+		callback(result);
+	});
 }
 
 io.on('connection', function(socket) {
 	// Get autocomplete json
-	var json = listAvailableTracks();
-	socket.emit('autocomplete', JSON.stringify(json));
-
+	listAvailableTracks(function(json) {
+		socket.emit('autocomplete', JSON.stringify(json));
+	});
 	socket.on('mashup', function(msg) {
 		track = msg.file;
 		file = track + '.features.gz';
@@ -67,7 +76,16 @@ io.on('connection', function(socket) {
 	});
 });
 
+var url = 'mongodb://localhost:27017/music'
+console.log(url)
+var mongo;
 
-http.listen(HTTP_PORT, function () {
-	console.log('HTTP listening on port ' + HTTP_PORT);
+MongoClient.connect(url, function(err, db) {
+	assert.equal(null, err);
+	console.log("Connected successfully to server");
+	mongo = db
+	http.listen(HTTP_PORT, function () {
+		console.log('HTTP listening on port ' + HTTP_PORT);
+	});
 });
+

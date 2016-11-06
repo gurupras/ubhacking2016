@@ -23,18 +23,20 @@ def setup_parser(parser=None):
 		parser = argparse.ArgumentParser(description='Process audio file')
 	parser.add_argument('source', help='The file or directory to process')
 	parser.add_argument('--dump', action='store_true', help='Dump intermediate format')
+	parser.add_argument('--plot', action='store_true', default=False, help='Plot')
 	return parser
 
 def common_process(dump_callback, print_callback, regex):
 	parser = setup_parser()
 	args = parser.parse_args()
 
+	
 	if args.dump:
-		process_path(args.source, dump_callback, regex='*.mp3')
+		process_path(args.source, dump_callback, regex='*.mp3', **vars(args))
 	else:
-		process_path(args.source, print_callback, regex=regex)
+		process_path(args.source, print_callback, regex=regex, **vars(args))
 
-def process_path(path, callback, pool=None, regex='*'):
+def process_path(path, callback, pool=None, regex='*', **kwargs):
 	entry = FileEntry(path, None)
 	entry.build(regex=regex)
 	if pool:
@@ -44,9 +46,9 @@ def process_path(path, callback, pool=None, regex='*'):
 		for file in entry.get_files():
 			if pool:
 				pool.apply_async(func=callback, args=(file.path(),))
-			process_path(file.path(), callback, pool, regex)
+			process_path(file.path(), callback, pool, regex, **kwargs)
 	else:
-		callback(entry.path())
+		callback(entry.path(), **kwargs)
 	if pool:
 		pool.close()
 		pool.join()

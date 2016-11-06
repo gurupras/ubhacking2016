@@ -32,7 +32,9 @@ def main():
 	if not os.path.exists(outdir):
 		os.makedirs(outdir)
 
+	sys.argv[2] = sys.argv[2].replace('__MAGIC__', "'")
 	data = json.loads(sys.argv[2])
+
 	pool = multiprocessing.Pool()
 
 	# Make a temporary file to get a sense of a unique prefix we can use for all temporary files

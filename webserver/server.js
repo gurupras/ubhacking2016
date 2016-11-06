@@ -17,6 +17,15 @@ var HTTP_PORT = 8080;
 app.use(morgan('combined'));
 app.use(compression());
 
+
+
+
+var MASHUP_DIR = '/tmp/mashup/';
+const startDuration = 15.0;
+const usePrevBpm = true;
+const sourceFreq = 2;
+
+
 /* ------------------------ TEST URLS ------------------------*/
 app.get('/', function (req, res) {
 	res.send(fs.readFileSync(__dirname + '/static/html/index.html', 'utf-8'));
@@ -25,7 +34,7 @@ app.get('/', function (req, res) {
 /* -------------------- END OF TEST URLS --------------------*/
 
 app.use('/static', express.static('./static'));
-app.use('/media/ext/Guru/Music', express.static('/media/ext/Guru/Music'));
+app.use(MASHUP_DIR, express.static(MASHUP_DIR));
 
 //function mashup(
 
@@ -85,10 +94,6 @@ function createBpmLists(callback) {
 	});
 }
 
-const startDuration = 15.0;
-const usePrevBpm = false;
-const sourceFreq = 2;
-
 function mashup(id, callback) {
 	result = []
 	collection = mongo.collection('songs')
@@ -117,7 +122,7 @@ function mashup(id, callback) {
 				sourceCntr += 1;
 			}
 			prevBpm = choice.data.tempo;
-			blob = {source: choice.source, start: choice.data.start, duration: choice.data.duration}
+			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration}
 			blobs.push(blob)
 			index += 1;
 		}
@@ -143,6 +148,12 @@ io.on('connection', function(socket) {
 					console.log(b)
 				}
 				// TODO: What?
+				var blobStr = JSON.stringify(blobs);
+				blobStr = blobStr.replace(/'/g, '__MAGIC__');
+				var mashupFile = child_process.execSync('python ../stitcher.py ' + MASHUP_DIR + ' \'' + blobStr + '\'');
+				var data = {};
+				data.src = mashupFile.toString('utf-8');
+				socket.emit('mashup', JSON.stringify(data));
 				console.log('mashup done')
 			});
 		}
@@ -161,4 +172,3 @@ MongoClient.connect(url, function(err, db) {
 		console.log('HTTP listening on port ' + HTTP_PORT);
 	});
 });
-

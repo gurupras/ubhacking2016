@@ -68,7 +68,7 @@ function processFile(path, collection) {
 }
 
 function processDir(path, db) {
-	var collection = db.collection('documents');
+	var collection = db.collection('songs');
 	var files = fs.readdirSync(path)
 	for (var f of files) {
 		if (f.endsWith('features.gz')) {
@@ -79,7 +79,7 @@ function processDir(path, db) {
 }
 
 var insertDocuments = function(db, callback) {
-	var collection = db.collection('documents');
+	var collection = db.collection('songs');
 	collection.remove()
 	processDir(args.source, db)
 	callback()

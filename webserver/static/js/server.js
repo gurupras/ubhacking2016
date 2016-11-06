@@ -39,6 +39,14 @@ window.onload = function() {
 				type: 'audio/mp3',
 			}],
 		});
+		$('#download').on('click', function() {
+			window.location = json.src;
+		});
+		for (var b of json.blobs) {
+			delete b.path;
+		}
+		var pretty = JSON.stringify(json.blobs, null, 4).replace(/\n/g, '<br>');
+		$('#debug').html(pretty);
 	});
 
 	function submit(file) {

@@ -80,14 +80,14 @@ function createBpmLists(callback) {
 	}
 	bpms = {}
 	collection = mongo.collection('songs')
-	collection.find({}, {_id:true, ub_source_file:true, sections:true}).toArray(function(err, docs) {
+	collection.find({}, {_id:true, ub_source_file:true, sections:true, artist:true, track:true}).toArray(function(err, docs) {
 		for (var d of docs) {
 			for (section of d.sections) {
 				tempo = round5(section.tempo);
 				if (!bpms[tempo]) {
 					bpms[tempo] = []
 				}
-				bpms[tempo].push({_id:d._id, source: d.ub_source_file, data: section})
+				bpms[tempo].push({_id:d._id, source: d.ub_source_file, data: section, track: d.artist + ' - ' + d.track})
 			}
 		}
 		callback()
@@ -108,7 +108,7 @@ function mashup(id, callback) {
 			// Pick next section
 			if (pos < startDuration || sourceCntr == sourceFreq || index == l-1) {
 				pos += s.duration;
-				choice = {_id: item._id, source: item.ub_source_file, data: s}
+				choice = {_id: item._id, source: item.ub_source_file, data: s, track: item.artist + ' - ' + item.track}
 				sourceCntr = 0;
 			} else {
 				if (usePrevBpm) {
@@ -122,7 +122,7 @@ function mashup(id, callback) {
 				sourceCntr += 1;
 			}
 			prevBpm = choice.data.tempo;
-			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration}
+			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration, track: choice.track}
 			blobs.push(blob)
 			index += 1;
 		}
@@ -152,6 +152,7 @@ io.on('connection', function(socket) {
 				blobStr = blobStr.replace(/'/g, '__MAGIC__');
 				var mashupFile = child_process.execSync('python ../stitcher.py ' + MASHUP_DIR + ' \'' + blobStr + '\'');
 				var data = {};
+				data.blobs = blobs;
 				data.src = mashupFile.toString('utf-8');
 				socket.emit('mashup', JSON.stringify(data));
 				console.log('mashup done')

@@ -18,7 +18,7 @@ window.onload = function() {
 		},
 	})[0];
 
-	socket = io('http://dirtydeeds:8080');
+	socket = io();
 
 	socket.on('autocomplete', function(msg) {
 		var json = JSON.parse(msg);

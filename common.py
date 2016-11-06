@@ -30,9 +30,8 @@ def common_process(dump_callback, print_callback, regex):
 	parser = setup_parser()
 	args = parser.parse_args()
 
-	
 	if args.dump:
-		process_path(args.source, dump_callback, regex='*.mp3', **vars(args))
+		process_path(args.source, dump_callback, regex=['*.mp3', '*.m4a'], **vars(args))
 	else:
 		process_path(args.source, print_callback, regex=regex, **vars(args))
 

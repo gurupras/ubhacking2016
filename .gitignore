@@ -15,3 +15,5 @@ pycommons/
 
 /.config
 /.tokens
+
+outdir/

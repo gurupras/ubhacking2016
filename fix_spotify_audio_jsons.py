@@ -30,7 +30,7 @@ def process(path, queue):
 			f.write(json.dumps(data))
 
 		if queue is not None:
-			queue.put(None)
+			queue.put((None))
 	except Exception, e:
 		if queue is not None:
 			tb = traceback.format_exc()
@@ -41,7 +41,7 @@ def process(path, queue):
 
 basepath = sys.argv[1]
 
-pattern = re.compile('(?P<artist>.*) - (?P<track>.*)')
+pattern = re.compile('(?P<artist>.*) - (?P<track>.*).(features|analysis)')
 
 
 pool = multiprocessing.Pool()
@@ -55,7 +55,7 @@ for f in files:
 	#pool.apply_async(func=process, args=(path, queue))
 	process(path, queue)
 	started += 1
-	if started % 1 == 0:
+	if started % 100 == 0:
 		print 'Finished {}'.format(started)
 pool.close()
 

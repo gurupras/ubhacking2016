@@ -152,6 +152,7 @@ io.on('connection', function(socket) {
 				blobStr = blobStr.replace(/'/g, '__MAGIC__');
 				var mashupFile = child_process.execSync('python ../stitcher.py ' + MASHUP_DIR + ' \'' + blobStr + '\'');
 				var data = {};
+				data.blobs = blobs;
 				data.src = mashupFile.toString('utf-8');
 				socket.emit('mashup', JSON.stringify(data));
 				console.log('mashup done')

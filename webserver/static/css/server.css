@@ -2,7 +2,7 @@ body {
   background-color: #eeeeee;
   /*margin: 10px;
     padding: 10px;*/
-  overflow: hidden;
+  overflow: auto;
 }
 
 #body-div {
@@ -44,4 +44,17 @@ body {
   left: 0;
   width: 100% !important;
   height: 100% !important;
+}
+
+#download:hover {
+    cursor: pointer;
+}
+
+#debug {
+    position:relative;
+    right: 0;
+    padding-right: 5%;
+    padding-left: 10%;
+    font-size: 0.8em;
+
 }

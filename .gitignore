@@ -12,3 +12,6 @@ pycommons/
 *.bpm.gz
 *.pitch
 *.pitch.gz
+
+/.config
+/.tokens

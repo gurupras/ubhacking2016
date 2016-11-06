@@ -42,7 +42,7 @@ window.onload = function() {
 		$('#download').on('click', function() {
 			window.location = json.src;
 		});
-		for (var b of blobs) {
+		for (var b of json.blobs) {
 			delete b.path;
 		}
 		var pretty = JSON.stringify(json.blobs, null, 4).replace(/\n/g, '<br>');

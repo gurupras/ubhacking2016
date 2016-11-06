@@ -46,7 +46,7 @@ window.onload = function() {
 
 		// Hide spinner
 		$('#spinner').hide();
-		
+
 		for (var b of json.blobs) {
 			delete b.path;
 		}
@@ -55,20 +55,27 @@ window.onload = function() {
 	});
 
 	function submit(file) {
+		$('#spinner').show();
 		socket.emit('mashup', {file: file});
 	};
 
 	var runOnce;
 
 //TODO: Enter
-	$('#search').on('keyup', function(e) {
+
+	$('#search-input').on('keyup', function(e) {
+		// Clear debug
+		$('#debug').html('');
+		if(e.which == 13) {
+			submit($(this).val());
+		}
 
 		if(runOnce) {
 			$('#search').off('keyup');
 		} else {
 			$('#search').find('.dropdown-content').on('click', function(e) {
 				submit($(e.target).text());
-				$('#spinner').show();
+
 			});
 			runOnce = true;
 		}

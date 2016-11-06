@@ -64,6 +64,6 @@ for idx in range(started):
 	data = queue.get()
 	if data is not None:
 		print '{} - {}'.format(data[0], data[1])
-	if idx % 1 == 0:
-		print 'Processed %03d files' % (dx)
+	if idx % 1000 == 0:
+		print 'Processed %03d files' % (idx)
 pool.join()

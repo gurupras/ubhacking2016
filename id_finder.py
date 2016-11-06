@@ -9,7 +9,7 @@ import spotify
 import pycommons
 import logging
 from pycommons import generic_logging
-generic_logging.init(level=logging.ERROR)
+generic_logging.init(level=logging.DEBUG)
 logger = logging.getLogger(__file__)
 
 from pycommons.file_entry import FileEntry
@@ -88,6 +88,9 @@ def process(path, outdir, regex, sampling):
 
 			features = s.audio_features(trackid)
 			analysis = s.audio_analysis(trackid)
+
+			features['ub_source_file'] = os.path.abspath(file.path())
+			analysis['ub_source_file'] = os.path.abspath(file.path())
 
 			base = '{} - {}'.format(artist, track)
 			# XXX: Hack..handle AC/DC

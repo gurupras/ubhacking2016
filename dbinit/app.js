@@ -2,8 +2,7 @@
 
 var MongoClient = require('mongodb').MongoClient,
 	assert = require('assert'),
-	ArgumentParser = require('argparse').ArgumentParser
-	streams = require('memory-streams');
+	ArgumentParser = require('argparse').ArgumentParser,
 	child_process = require('child_process');
 
 const fs = require('fs');
@@ -72,6 +71,9 @@ function processDir(path, db) {
 	var files = fs.readdirSync(path)
 	for (var f of files) {
 		if (f.endsWith('features.gz')) {
+			if(f.indexOf('"') >= 0) {
+				continue;
+			}
 			console.log(f)
 			processFile(args.source + f, collection)
 		}

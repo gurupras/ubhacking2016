@@ -9,8 +9,8 @@ var child_process = require('child_process');
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-var MongoClient = require('mongodb').MongoClient
-var assert = require('assert')
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
 
 var HTTP_PORT = 8080;
 
@@ -51,14 +51,14 @@ function listAvailableTracks(callback) {
 		return;
 	}
 	var result = [];
-	collection = mongo.collection('songs')
+	collection = mongo.collection('songs');
 	collection.find({}, {_id:true, artist:true, track:true}).toArray(function(err, docs) {
-		console.log(docs.length)
+		console.log(docs.length);
 		for (var d of docs) {
-			var name = d.artist + ' - ' + d.track.replace('.features', '')
+			var name = d.artist + ' - ' + d.track.replace('.features', '');
 			name = name.replace(/_/g, '/');
 			result.push(name);
-			trackMap[name] = d._id
+			trackMap[name] = d._id;
 		}
 		console.log('result files:' + result.length);
 		availableTracks = result;
@@ -68,35 +68,35 @@ function listAvailableTracks(callback) {
 }
 
 function round5(x) {
-	return Math.ceil(x/5)*5
+	return Math.ceil(x/5)*5;
 }
 
 var bpms;
 
 function createBpmLists(callback) {
 	if (bpms) {
-		callback()
-		return
+		callback();
+		return;
 	}
-	bpms = {}
-	collection = mongo.collection('songs')
+	bpms = {};
+	collection = mongo.collection('songs');
 	collection.find({}, {_id:true, ub_source_file:true, sections:true, artist:true, track:true}).toArray(function(err, docs) {
 		for (var d of docs) {
 			for (section of d.sections) {
 				tempo = round5(section.tempo);
 				if (!bpms[tempo]) {
-					bpms[tempo] = []
+					bpms[tempo] = [];
 				}
-				bpms[tempo].push({_id:d._id, source: d.ub_source_file, data: section, track: d.artist + ' - ' + d.track})
+				bpms[tempo].push({_id:d._id, source: d.ub_source_file, data: section, track: d.artist + ' - ' + d.track});
 			}
 		}
-		callback()
+		callback();
 	});
 }
 
 function mashup(id, callback) {
-	result = []
-	collection = mongo.collection('songs')
+	var result = [];
+	collection = mongo.collection('songs');
 	collection.findOne({_id: id}, function(err, item) {
 		var pos = 0.0, index = 0, prevBpm = 0;
 		var wasSource = false, blobs = [];
@@ -108,7 +108,7 @@ function mashup(id, callback) {
 			// Pick next section
 			if (pos < startDuration || sourceCntr == sourceFreq || index == l-1) {
 				pos += s.duration;
-				choice = {_id: item._id, source: item.ub_source_file, data: s, track: item.artist + ' - ' + item.track}
+				choice = {_id: item._id, source: item.ub_source_file, data: s, track: item.artist + ' - ' + item.track};
 				sourceCntr = 0;
 			} else {
 				if (usePrevBpm) {
@@ -122,11 +122,11 @@ function mashup(id, callback) {
 				sourceCntr += 1;
 			}
 			prevBpm = choice.data.tempo;
-			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration, track: choice.track}
-			blobs.push(blob)
+			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration, track: choice.track};
+			blobs.push(blob);
 			index += 1;
 		}
-		callback(blobs)
+		callback(blobs);
 	});
 }
 
@@ -138,14 +138,14 @@ io.on('connection', function(socket) {
 	});
 	socket.on('mashup', function(msg) {
 		track = msg.file;
-		var id = trackMap[track]
+		var id = trackMap[track];
 		if (id) {
-			console.log('found id=' +id)
+			console.log('found id=' +id);
 			mashup(id, function(blobs) {
 				//data.src = json.ub_source_file;
 				//socket.emit('mashup', JSON.stringify(data));
 				for (b of blobs) {
-					console.log(b)
+					console.log(b);
 				}
 				// TODO: What?
 				var blobStr = JSON.stringify(blobs);
@@ -155,20 +155,20 @@ io.on('connection', function(socket) {
 				data.blobs = blobs;
 				data.src = mashupFile.toString('utf-8');
 				socket.emit('mashup', JSON.stringify(data));
-				console.log('mashup done')
+				console.log('mashup done');
 			});
 		}
 	});
 });
 
-var url = 'mongodb://localhost:27017/music'
-console.log(url)
+var url = 'mongodb://localhost:27017/music';
+console.log(url);
 var mongo;
 
 MongoClient.connect(url, function(err, db) {
 	assert.equal(null, err);
-	console.log("Connected successfully to server");
-	mongo = db
+	console.log('Connected successfully to server');
+	mongo = db;
 	http.listen(HTTP_PORT, function () {
 		console.log('HTTP listening on port ' + HTTP_PORT);
 	});

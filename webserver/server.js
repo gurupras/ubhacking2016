@@ -102,7 +102,7 @@ function mashup(id, callback) {
 		var wasSource = false, blobs = [];
 		var l = item.sections.length;
 		sourceCntr = 0;
-
+		var prevBlob;
 		for (s of item.sections) {
 			var choice;
 			// Pick next section
@@ -123,7 +123,12 @@ function mashup(id, callback) {
 			}
 			prevBpm = choice.data.tempo;
 			blob = {path: choice.source, start: choice.data.start, duration: choice.data.duration, track: choice.track};
-			blobs.push(blob);
+			if(prevBlob !== undefined && prevBlob.path === blob.path) {
+				prevBlob.duration += blob.duration;
+			} else {
+				blobs.push(blob);
+				prevBlob = blob;
+			}
 			index += 1;
 		}
 		callback(blobs);

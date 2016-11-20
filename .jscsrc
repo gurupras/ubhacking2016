@@ -1,0 +1,9 @@
+{
+	maxErrors: 500,
+	validateQuoteMarks: "'",
+	requireSemicolons: true,
+	requireCapitalizedConstructors: true,
+	disallowEmptyBlocks: true,
+	disallowTrailingWhitespace: true,
+	validateIndentation: "\t",
+}
